@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>File API Sample</title>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div id="title">
+                <h1>ファイル読み取り アプリケーション</h1>
+            </div>
+        </header>
+        <section id="main">
+		<h3>画像ファイルかテキストファイルを選択すると、そのファイルの中身が表示されます。</h3>
+		<p>ドラッグアンドドロップで1つから複数のファイルの内容を取得します。</p>
+		<div id="drop" style="width:700px; height:150px; padding:10px; border:3px solid"
+                  ondragover="onDragOver(event)">
+                  ここにドロップしたファイルの内容を表示します。</div>
+        <br />
+        <div id="disp" ></div>
+        <script type="text/javascript">
+            if (window.File) {
+                // File APIに関する処理を記述
+                window.alert("File APIが実装されてます。");
+                document.getElementById("drop").addEventListener("drop", onDrop, false);
+            } else {
+                window.alert("本ブラウザではFile APIが使えません");
+            }
+			function make_it_table(tsv_data){
+				
+			}
+
+	        // Drop領域にドロップした際のファイルのプロパティ情報読み取り処理
+	        function onDrop(event){
+		        var files = event.dataTransfer.files;
+		        var disp = document.getElementById("disp");
+		        disp.innerHTML ="";
+
+		        // ファイルの配列から1つずつファイルを選択
+		        for(var i=0; i< files.length; i++){
+			        var f = files[i];
+			        // ①FileReaderオブジェクトの生成
+			        var reader = new FileReader();
+
+			        // ②画像ファイルかテキストファイルかを判定
+			        if (!f.type.match('image.*') && !f.type.match('text.*')) {
+				        alert("画像ファイルとテキストファイル以外は表示できません。");
+				        continue;
+			        }
+
+			        // ③エラー発生時の処理
+			        reader.onerror = function (evt) {
+				        disp.innerHTML = "読み取り時にエラーが発生しました。";
+			        }
+
+			        // ④画像ファイルの場合の処理
+			        if (f.type.match('image.*')) {
+				        // ファイル読取が完了した際に呼ばれる処理
+				        reader.onload = function (evt) {
+					        var li = document.createElement('li');
+					        var img = document.createElement('img');
+					        img.src = evt.target.result;
+					        li.appendChild(img);
+					        li.innerHTML += "<br />";
+					        disp.appendChild(li);
+				        }
+				        // readAsDataURLメソッドでファイルの内容を取得
+				        reader.readAsDataURL(f);
+			        }
+
+			        // ⑤テキストファイルの場合の処理
+			        if (f.type.match('text.*')) {
+				        // ファイル読取が完了した際に呼ばれる処理
+				        reader.onload = function (evt) {
+					        // FileReaderが取得したテキストをそのままdivタグに出力
+					        disp.innerHTML = reader.result;
+				        }
+				        // readAsTextメソッドでファイルの内容を取得
+				        reader.readAsText(f, 'shift-jis');
+			        }
+	        }
+	        // ⑥ブラウザ上でファイルを展開する挙動を抑止
+	        event.preventDefault();
+	        }
+
+	        function onDragOver(event){ 
+		        // ⑥ブラウザ上でファイルを展開する挙動を抑止
+		        event.preventDefault(); 
+	        }
+        </script>
+        </section>
+        <footer>
+        </footer>
+    </div>
+</body>
+</html>
+

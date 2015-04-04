@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>File API Sample</title>
+</head>
+<body>
+    <div class="page">
+        <header>
+            <div id="title">
+                <h1>ファイル読み取り アプリケーション</h1>
+            </div>
+        </header>
+        <section id="main">
+		<h3>ドラッグアンドドロップで1つから複数のファイルのプロパティを取得します。</h3>
+		<div id="drop" style="width:700px; height:150px; padding:10px; border:3px solid"
+                  ondragover="onDragOver(event)" ></div>
+		<p>ファイルプロパティ表示</p>
+		<div id="disp" ></div>
+		<script type="text/javascript">
+		    if (window.File) {
+		        // File APIに関する処理を記述
+		        window.alert("File APIが実装されてます。");
+		        document.getElementById("drop").addEventListener("drop", onDrop, false);
+		    } else {
+		        window.alert("本ブラウザではFile APIが使えません");
+		    }
+
+		    // Drop領域にドロップした際のファイルのプロパティ情報読み取り処理
+		    function onDrop(event) {
+		        var files = event.dataTransfer.files;
+		        var disp = document.getElementById("disp");
+		        disp.innerHTML = "";
+
+		        for (var i = 0; i < files.length; i++) {
+		            var f = files[i];
+		            // ファイル名とサイズを表示
+		            disp.innerHTML += "ファイル名 :" + f.name + "ファイルの型:" + f.type + "ファイルサイズ:" + f.size / 1000 + " KB " + "<br />";
+		        }
+		        event.preventDefault();
+		    }
+
+		    function onDragOver(event) {
+		        event.preventDefault();
+		    }
+		</script>
+        </section>
+        <footer>
+        </footer>
+    </div>
+</body>
+</html>

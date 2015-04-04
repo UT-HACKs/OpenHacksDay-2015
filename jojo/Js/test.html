@@ -1,0 +1,101 @@
+<html>
+  <head>
+    <title></title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load("jquery", "1.3.2");
+    </script>
+    
+    <script type="text/javascript">
+      $(function() {
+        var update = function() {
+          $.ajax({
+            url: "http://localhost/canvas/graph.php",
+            dataType: "json",
+            success: plot,
+            error: function() {
+              alert("error");
+            }
+          });
+        };
+
+        function plot(data) {        
+          var canvas = document.getElementById('c1');
+          var ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height); 
+
+          var x = [];
+          var y = [];
+          for(var i = 0; i < data.length; i += 1) {
+            x.push(data[i].x);
+            y.push(data[i].y);
+          }
+ 
+          var max = {
+            x: x.sort(function(a, b) { return b - a;})[0],
+            y: y.sort(function(a, b) { return b - a;})[0]
+          };
+ 
+          var initial = {x: canvas.width / 10, y: canvas.height * (1 - (1 / 10))};
+          var width = (canvas.width * (1 - (1 / 10)) - (canvas.width / 10));
+          var height = (canvas.height * (1 - (1 / 10)) - (canvas.height / 10));
+ 
+          ctx.beginPath();
+          ctx.moveTo(initial.x, initial.y);
+          for(var i = 0; i < data.length; i += 1) {
+            x = width / max.x * data[i].x;
+            y = height / max.y * data[i].y;
+            ctx.lineTo(initial.x + x, initial.y - y);
+          }
+          ctx.stroke();
+          
+          ctx.beginPath();
+          ctx.moveTo(initial.x, initial.y);
+          ctx.lineTo(canvas.width - initial.x, initial.y);
+          ctx.stroke();
+          ctx.fillStyle = "red";
+          ctx.font = "18px 'ＭＳ Ｐゴシック'";
+          ctx.fillText("X", canvas.width / 2, canvas.height * (1 - (1 / 10)) + 3 * 10);
+ 
+          ctx.beginPath();
+          ctx.moveTo(initial.x, initial.y);
+          ctx.lineTo(initial.x, canvas.height / 10);
+          ctx.stroke();
+          ctx.fillStyle = "red";
+          ctx.font = "18px 'ＭＳ Ｐゴシック'";
+          ctx.fillText("Y", initial.x, canvas.height / 10 - 3 * 10);
+ 
+          var interval = 10;
+          var tics = width / interval;
+          for(var i = initial.x, j = 0; i <= initial.x + width; i += tics, j += 1) {
+            ctx.beginPath();
+            ctx.moveTo(i, canvas.height * (1 - (1 / 10)));
+            ctx.lineTo(i, canvas.height * (1 - (1 / 10)) - 10);
+            ctx.stroke();
+ 
+            ctx.fillStyle = "red";
+            ctx.font = "10px 'ＭＳ Ｐゴシック'";
+            ctx.fillText(max.x / interval * j, i, canvas.height * (1 - (1 / 10)) + 10);
+          }
+ 
+          var tics = ((canvas.height * (1 - (1 / 10))) - (canvas.height / 10)) / interval;
+          for(var i = initial.y, j = 0; i >= initial.y - height; i -= tics, j += 1) {
+            ctx.beginPath();
+            ctx.moveTo(initial.x, i);
+            ctx.lineTo(initial.x + 10, i);
+            ctx.stroke();
+ 
+            ctx.fillStyle = "red";
+            ctx.font = "10px 'ＭＳ Ｐゴシック'";
+            ctx.fillText(max.y / interval * j, canvas.width / 10 - 2 * 10, i);
+          }
+        }
+        update();
+        setInterval(update, 10000);
+      })
+    </script>
+  </head>
+  <body>
+    <canvas id="c1" width="1000" height="1000"></canvas>
+  </body>
+</html>
